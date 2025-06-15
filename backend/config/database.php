@@ -1,26 +1,30 @@
 <?php
 
-use Doctrine\DBAL\DriverManager;
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
+use Doctrine\DBAL\DriverManager;
 
-return function () {
-    $config = ORMSetup::createAttributeMetadataConfiguration(
-        paths: [__DIR__ . '/../src/Entity'],
-        isDevMode: $_ENV['APP_DEBUG'] === 'true',
-    );
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
 
-    $connectionParams = [
-        'driver'   => 'pdo_mysql',
-        'host'     => $_ENV['DB_HOST'],
-        'port'     => $_ENV['DB_PORT'],
-        'dbname'   => $_ENV['DB_NAME'],
-        'user'     => $_ENV['DB_USER'],
-        'password' => $_ENV['DB_PASS'],
-        'charset'  => 'utf8mb4',
-    ];
+$config = ORMSetup::createAttributeMetadataConfiguration(
+    paths: [__DIR__ . '/../src/Entity'],
+    isDevMode: true,
+);
 
-    $connection = DriverManager::getConnection($connectionParams);
-    
-    return new EntityManager($connection, $config);
-};
+$dbParams = [
+    'driver'   => 'pdo_mysql',
+    'host'     => $_ENV['DB_HOST'] ?? 'localhost',
+    'port'     => $_ENV['DB_PORT'] ?? '3306',
+    'dbname'   => $_ENV['DB_NAME'] ?? 'test_sl',
+    'user'     => $_ENV['DB_USER'] ?? 'root',
+    'password' => $_ENV['DB_PASS'] ?? '',
+    'charset'  => 'utf8mb4'
+];
+
+$connection = DriverManager::getConnection($dbParams, $config);
+return new EntityManager($connection, $config); 

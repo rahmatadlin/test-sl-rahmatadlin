@@ -54,6 +54,9 @@ class Employee implements JsonSerializable
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
     private DateTime $updatedAt;
 
+    #[ORM\Column(name: 'deleted_at', type: 'datetime', nullable: true)]
+    private ?DateTime $deletedAt = null;
+
     public function __construct()
     {
         $this->createdAt = new DateTime();
@@ -132,6 +135,11 @@ class Employee implements JsonSerializable
         return $this->updatedAt;
     }
 
+    public function getDeletedAt(): ?DateTime
+    {
+        return $this->deletedAt;
+    }
+
     // Setters
     public function setNip(string $nip): self
     {
@@ -196,6 +204,12 @@ class Employee implements JsonSerializable
         return $this;
     }
 
+    public function setDeletedAt(?DateTime $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -212,6 +226,7 @@ class Employee implements JsonSerializable
             'alamat' => $this->alamat,
             'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
             'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
+            'deleted_at' => $this->deletedAt ? $this->deletedAt->format('Y-m-d H:i:s') : null,
         ];
     }
 }
