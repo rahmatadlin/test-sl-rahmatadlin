@@ -10,11 +10,6 @@
       </button>
     </div>
 
-    <!-- Dashboard Chart -->
-    <div class="mb-8">
-      <DashboardChart />
-    </div>
-
     <!-- Filters -->
     <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
       <div>
@@ -65,7 +60,7 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="text-center py-4">
+    <div v-if="storeLoading.fetch" class="text-center py-4">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
     </div>
 
@@ -75,18 +70,258 @@
     </div>
 
     <!-- Employee Table -->
-    <div v-if="!loading" class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div v-if="!storeLoading.fetch" class="bg-white shadow-md rounded-lg overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIP</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Join Date</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('nip')"
+            >
+              <div class="flex items-center">
+                NIP
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'nip'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('nama_lengkap')"
+            >
+              <div class="flex items-center">
+                Name
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'nama_lengkap'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('email')"
+            >
+              <div class="flex items-center">
+                Email
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'email'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('no_telepon')"
+            >
+              <div class="flex items-center">
+                Phone
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'no_telepon'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('jabatan')"
+            >
+              <div class="flex items-center">
+                Position
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'jabatan'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('departemen')"
+            >
+              <div class="flex items-center">
+                Department
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'departemen'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('tanggal_masuk')"
+            >
+              <div class="flex items-center">
+                Join Date
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'tanggal_masuk'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
+            <th 
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              @click="handleSort('status')"
+            >
+              <div class="flex items-center">
+                Status
+                <span class="ml-1">
+                  <svg 
+                    v-if="sortField === 'status'" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4" 
+                    :class="{ 'transform rotate-180': sortOrder === 'desc' }" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <svg 
+                    v-else 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-4 w-4 opacity-0 group-hover:opacity-100" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </span>
+              </div>
+            </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
@@ -270,14 +505,22 @@
                 type="button"
                 @click="closeModal"
                 class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                :disabled="storeLoading.create || storeLoading.update"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+                :disabled="storeLoading.create || storeLoading.update"
               >
-                {{ isEditing ? 'Update' : 'Create' }}
+                <span v-if="storeLoading.create || storeLoading.update" class="mr-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+                {{ isEditing ? 'Update' : 'Add' }}
               </button>
             </div>
           </form>
@@ -297,13 +540,21 @@
             <button
               @click="closeDeleteModal"
               class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+              :disabled="storeLoading.delete"
             >
               Cancel
             </button>
             <button
               @click="handleDelete"
-              class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center"
+              :disabled="storeLoading.delete"
             >
+              <span v-if="storeLoading.delete" class="mr-2">
+                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
               Delete
             </button>
           </div>
@@ -316,15 +567,17 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, onUnmounted } from 'vue'
 import { useEmployeeStore } from '@/stores/employee'
-import DashboardChart from '@/components/DashboardChart.vue'
+import { storeToRefs } from 'pinia'
 
 const store = useEmployeeStore()
-const loading = ref(false)
 const error = ref<string | null>(null)
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const selectedEmployee = ref<any>(null)
+
+// Add loading states from store
+const { loading: storeLoading } = storeToRefs(store)
 
 const filters = ref({
   search: '',
@@ -365,6 +618,10 @@ const departments = computed(() => store.departments)
 const jabatanList = computed(() => store.jabatanList)
 const pagination = computed(() => store.pagination)
 
+// Add these new refs for sorting
+const sortField = ref('')
+const sortOrder = ref<'asc' | 'desc'>('asc')
+
 // Helper function to format date
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('id-ID', {
@@ -376,15 +633,20 @@ const formatDate = (date: string) => {
 
 // Methods
 const fetchData = async () => {
-  loading.value = true
   try {
-    await store.fetchEmployees(pagination.value.current_page, pagination.value.limit, filters.value)
+    await store.fetchEmployees(
+      pagination.value.current_page, 
+      pagination.value.limit, 
+      {
+        ...filters.value,
+        sort_field: sortField.value,
+        sort_order: sortOrder.value
+      }
+    )
     await store.fetchDepartments()
     await store.fetchPositionList()
   } catch (err: any) {
     error.value = err.message
-  } finally {
-    loading.value = false
   }
 }
 
@@ -493,4 +755,15 @@ onUnmounted(() => {
 onMounted(() => {
   fetchData()
 })
+
+// Add the handleSort function
+const handleSort = (field: string) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortOrder.value = 'asc'
+  }
+  fetchData()
+}
 </script> 

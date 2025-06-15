@@ -42,6 +42,12 @@ class EmployeeController
             if (!empty($queryParams['search'])) {
                 $filters['search'] = $queryParams['search'];
             }
+            if (!empty($queryParams['sort_field'])) {
+                $filters['sort_field'] = $queryParams['sort_field'];
+            }
+            if (!empty($queryParams['sort_order'])) {
+                $filters['sort_order'] = $queryParams['sort_order'];
+            }
 
             $result = $this->service->getAllEmployees($page, $limit, $filters);
             

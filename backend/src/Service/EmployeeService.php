@@ -20,21 +20,7 @@ class EmployeeService
 
     public function getAllEmployees(int $page = 1, int $limit = 50, array $filters = []): array
     {
-        $offset = ($page - 1) * $limit;
-        $employees = $this->repository->findAll($limit, $offset, $filters);
-        $total = $this->repository->count($filters);
-        
-        return [
-            'data' => $employees,
-            'pagination' => [
-                'current_page' => $page,
-                'per_page' => $limit,
-                'total' => $total,
-                'total_pages' => (int) ceil($total / $limit),
-                'has_next' => $page < ceil($total / $limit),
-                'has_prev' => $page > 1,
-            ]
-        ];
+        return $this->repository->findAll($page, $limit, $filters);
     }
 
     public function getEmployeeById(int $id): ?Employee

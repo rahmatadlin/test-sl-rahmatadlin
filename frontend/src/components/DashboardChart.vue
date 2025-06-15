@@ -35,7 +35,7 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: 'Employee Statistics by Department'
+      text: 'Statistics by Department'
     },
     tooltip: {
       trigger: 'axis'
@@ -43,14 +43,24 @@ const updateChart = () => {
     legend: {
       data: ['Total Employees']
     },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      containLabel: true
+    },
     xAxis: {
       type: 'category',
-      data: store.statistics.by_department.map((dept: any) => dept.departemen)
+      data: store.statistics.by_department.map((dept: any) => dept.departemen),
+      axisLabel: {
+        interval: 0,
+        rotate: 45,
+        margin: 20
+      }
     },
     yAxis: {
       type: 'value',
-      min: 0,
-      interval: 1,
+      minInterval: 1,
       axisLabel: {
         formatter: (value: number) => Math.round(value).toString()
       }
@@ -92,6 +102,6 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-[400px] bg-white rounded-lg shadow-lg p-4">
-    <div ref="chartRef" class="w-full h-full"></div>
+    <div ref="chartRef" class="w-full h-full min-w-[800px]"></div>
   </div>
 </template> 

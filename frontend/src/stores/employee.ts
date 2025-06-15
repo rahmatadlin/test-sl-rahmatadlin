@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from '@/plugins/axios'
+import { useNotificationStore } from './notification'
 
 interface Employee {
   id: number
@@ -28,6 +29,12 @@ interface EmployeeState {
     total_items: number
     limit: number
   }
+  loading: {
+    create: boolean
+    update: boolean
+    delete: boolean
+    fetch: boolean
+  }
 }
 
 export const useEmployeeStore = defineStore('employee', {
@@ -41,11 +48,18 @@ export const useEmployeeStore = defineStore('employee', {
       total_pages: 1,
       total_items: 0,
       limit: 10
+    },
+    loading: {
+      create: false,
+      update: false,
+      delete: false,
+      fetch: false
     }
   }),
 
   actions: {
     async fetchEmployees(page = 1, limit = 10, filters = {}) {
+      this.loading.fetch = true
       try {
         const response = await axios.get(`/employees`, {
           params: {
@@ -64,7 +78,11 @@ export const useEmployeeStore = defineStore('employee', {
         }
       } catch (error) {
         console.error('Error fetching employees:', error)
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Failed to fetch employees', 'error')
         throw error
+      } finally {
+        this.loading.fetch = false
       }
     },
 
@@ -74,6 +92,8 @@ export const useEmployeeStore = defineStore('employee', {
         this.departments = response.data.data
       } catch (error) {
         console.error('Error fetching departments:', error)
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Failed to fetch departments', 'error')
         throw error
       }
     },
@@ -83,7 +103,9 @@ export const useEmployeeStore = defineStore('employee', {
         const response = await axios.get('/positions')
         this.jabatanList = response.data.data
       } catch (error) {
-        console.error('Error fetching jabatan list:', error)
+        console.error('Error fetching positions:', error)
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Failed to fetch positions', 'error')
         throw error
       }
     },
@@ -94,37 +116,62 @@ export const useEmployeeStore = defineStore('employee', {
         this.statistics = response.data.data
       } catch (error) {
         console.error('Error fetching statistics:', error)
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Failed to fetch statistics', 'error')
         throw error
       }
     },
 
-    async createEmployee(employeeData: Partial<Employee>) {
+    async createEmployee(employeeData: Omit<Employee, 'id' | 'created_at' | 'updated_at'>) {
+      this.loading.create = true
       try {
         const response = await axios.post('/employees', employeeData)
-        return response.data
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Add 3 second delay
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Employee created successfully')
+        return response.data.data
       } catch (error) {
         console.error('Error creating employee:', error)
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Failed to create employee', 'error')
         throw error
+      } finally {
+        this.loading.create = false
       }
     },
 
     async updateEmployee(id: number, employeeData: Partial<Employee>) {
+      this.loading.update = true
       try {
         const response = await axios.put(`/employees/${id}`, employeeData)
-        return response.data
+        await new Promise(resolve => setTimeout(resolve, 3000)) 
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Employee updated successfully')
+        return response.data.data
       } catch (error) {
         console.error('Error updating employee:', error)
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Failed to update employee', 'error')
         throw error
+      } finally {
+        this.loading.update = false
       }
     },
 
     async deleteEmployee(id: number) {
+      this.loading.delete = true
       try {
-        const response = await axios.delete(`/employees/${id}`)
-        return response.data
+        await axios.delete(`/employees/${id}`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Employee deleted successfully')
       } catch (error) {
         console.error('Error deleting employee:', error)
+        const notificationStore = useNotificationStore()
+        notificationStore.addNotification('Failed to delete employee', 'error')
         throw error
+      } finally {
+        this.loading.delete = false
       }
     }
   }

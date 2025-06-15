@@ -19,7 +19,7 @@ class EmployeeRepository
         $this->repository = $em->getRepository(Employee::class);
     }
 
-    public function findAll(int $limit = 50, int $offset = 0, array $filters = []): array
+    public function findAll(int $page = 1, int $limit = 50, array $filters = []): array
     {
         $qb = $this->repository->createQueryBuilder('e');
 
@@ -44,11 +44,49 @@ class EmployeeRepository
                ->setParameter('search', '%' . $filters['search'] . '%');
         }
 
-        $qb->setMaxResults($limit)
-           ->setFirstResult($offset)
-           ->orderBy('e.createdAt', 'DESC');
+        // Apply sorting
+        if (!empty($filters['sort_field'])) {
+            $sortField = $filters['sort_field'];
+            $sortOrder = !empty($filters['sort_order']) && strtoupper($filters['sort_order']) === 'DESC' ? 'DESC' : 'ASC';
+            
+            // Map frontend field names to database column names
+            $fieldMapping = [
+                'nip' => 'e.nip',
+                'nama_lengkap' => 'e.namaLengkap',
+                'email' => 'e.email',
+                'no_telepon' => 'e.noTelepon',
+                'jabatan' => 'e.jabatan',
+                'departemen' => 'e.departemen',
+                'tanggal_masuk' => 'e.tanggalMasuk',
+                'status' => 'e.status'
+            ];
 
-        return $qb->getQuery()->getResult();
+            if (isset($fieldMapping[$sortField])) {
+                $qb->orderBy($fieldMapping[$sortField], $sortOrder);
+            }
+        } else {
+            // Default sorting by NIP if no sort field is specified
+            $qb->orderBy('e.nip', 'ASC');
+        }
+
+        // Calculate pagination
+        $total = $this->count($filters);
+        $offset = ($page - 1) * $limit;
+
+        $qb->setFirstResult($offset)
+           ->setMaxResults($limit);
+
+        $employees = $qb->getQuery()->getResult();
+
+        return [
+            'data' => $employees,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $limit,
+                'total' => $total,
+                'total_pages' => ceil($total / $limit)
+            ]
+        ];
     }
 
     public function count(array $filters = []): int
