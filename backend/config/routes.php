@@ -19,6 +19,7 @@ return function (App $app) {
         
         // Additional utility routes
         $group->get('/departments', [EmployeeController::class, 'getDepartments']);
+        $group->get('/positions', [EmployeeController::class, 'getPositions']);
         $group->get('/statistics', [EmployeeController::class, 'getStatistics']);
     });
 

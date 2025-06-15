@@ -110,6 +110,11 @@ class EmployeeService
         return $this->repository->getDepartments();
     }
 
+    public function getPositions(): array
+    {
+        return $this->repository->getPositions();
+    }
+
     public function getStatistics(): array
     {
         return $this->repository->getStatistics();

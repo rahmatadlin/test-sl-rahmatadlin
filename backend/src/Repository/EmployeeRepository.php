@@ -34,6 +34,11 @@ class EmployeeRepository
                ->setParameter('status', $filters['status']);
         }
 
+        if (!empty($filters['jabatan'])) {
+            $qb->andWhere('e.jabatan = :jabatan')
+               ->setParameter('jabatan', $filters['jabatan']);
+        }
+
         if (!empty($filters['search'])) {
             $qb->andWhere('e.namaLengkap LIKE :search OR e.nip LIKE :search OR e.email LIKE :search')
                ->setParameter('search', '%' . $filters['search'] . '%');
@@ -60,6 +65,11 @@ class EmployeeRepository
         if (!empty($filters['status'])) {
             $qb->andWhere('e.status = :status')
                ->setParameter('status', $filters['status']);
+        }
+
+        if (!empty($filters['jabatan'])) {
+            $qb->andWhere('e.jabatan = :jabatan')
+               ->setParameter('jabatan', $filters['jabatan']);
         }
 
         if (!empty($filters['search'])) {
@@ -104,6 +114,15 @@ class EmployeeRepository
                               ->orderBy('e.departemen', 'ASC');
 
         return array_column($qb->getQuery()->getResult(), 'departemen');
+    }
+
+    public function getPositions(): array
+    {
+        $qb = $this->repository->createQueryBuilder('e')
+                              ->select('DISTINCT e.jabatan')
+                              ->orderBy('e.jabatan', 'ASC');
+
+        return array_column($qb->getQuery()->getResult(), 'jabatan');
     }
 
     public function getStatistics(): array

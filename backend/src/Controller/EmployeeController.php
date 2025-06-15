@@ -36,6 +36,9 @@ class EmployeeController
             if (!empty($queryParams['status'])) {
                 $filters['status'] = $queryParams['status'];
             }
+            if (!empty($queryParams['jabatan'])) {
+                $filters['jabatan'] = $queryParams['jabatan'];
+            }
             if (!empty($queryParams['search'])) {
                 $filters['search'] = $queryParams['search'];
             }
@@ -269,6 +272,33 @@ class EmployeeController
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Failed to retrieve departments',
+                'error' => $e->getMessage()
+            ]));
+            
+            return $response->withHeader('Content-Type', 'application/json')
+                          ->withStatus(500);
+        }
+    }
+
+    public function getPositions(Request $request, Response $response): Response
+    {
+        try {
+            $positions = $this->service->getPositions();
+            
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'message' => 'Position retrieved successfully',
+                'data' => $positions
+            ]));
+            
+            return $response->withHeader('Content-Type', 'application/json');
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Error retrieving positions', ['error' => $e->getMessage()]);
+            
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Failed to retrieve positions',
                 'error' => $e->getMessage()
             ]));
             

@@ -10,15 +10,20 @@
       </button>
     </div>
 
+    <!-- Dashboard Chart -->
+    <div class="mb-8">
+      <DashboardChart />
+    </div>
+
     <!-- Filters -->
-    <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
       <div>
         <label class="block text-sm font-medium text-gray-700">Search</label>
         <input
           v-model="filters.search"
           type="text"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Search by name or email"
+          placeholder="Search by name, NIP, or email"
         />
       </div>
       <div>
@@ -40,8 +45,21 @@
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
           <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="aktif">Aktif</option>
+          <option value="non_aktif">Non Aktif</option>
+          <option value="cuti">Cuti</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Jabatan</label>
+        <select
+          v-model="filters.jabatan"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option value="">All Positions</option>
+          <option v-for="jabatan in jabatanList" :key="jabatan" :value="jabatan">
+            {{ jabatan }}
+          </option>
         </select>
       </div>
     </div>
@@ -61,24 +79,33 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIP</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Join Date</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-for="employee in employees" :key="employee.id">
+            <td class="px-6 py-4 whitespace-nowrap">{{ employee.nip }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ employee.nama_lengkap }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ employee.email }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ employee.no_telepon }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ employee.jabatan }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ employee.departemen }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ formatDate(employee.tanggal_masuk) }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span
                 :class="{
                   'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
-                  'bg-green-100 text-green-800': employee.status === 'active',
-                  'bg-red-100 text-red-800': employee.status === 'inactive'
+                  'bg-green-100 text-green-800': employee.status === 'aktif',
+                  'bg-red-100 text-red-800': employee.status === 'non_aktif',
+                  'bg-yellow-100 text-yellow-800': employee.status === 'cuti'
                 }"
               >
                 {{ employee.status }}
@@ -139,7 +166,16 @@
           </h3>
           <form @submit.prevent="handleSubmit">
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Name</label>
+              <label class="block text-sm font-medium text-gray-700">NIP</label>
+              <input
+                v-model="form.nip"
+                type="text"
+                required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Full Name</label>
               <input
                 v-model="form.nama_lengkap"
                 type="text"
@@ -157,6 +193,26 @@
               />
             </div>
             <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+              <input
+                v-model="form.no_telepon"
+                type="tel"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Position</label>
+              <select
+                v-model="form.jabatan"
+                required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option v-for="jabatan in jabatanList" :key="jabatan" :value="jabatan">
+                  {{ jabatan }}
+                </option>
+              </select>
+            </div>
+            <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Department</label>
               <select
                 v-model="form.departemen"
@@ -169,15 +225,43 @@
               </select>
             </div>
             <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Join Date</label>
+              <input
+                v-model="form.tanggal_masuk"
+                type="date"
+                required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Salary</label>
+              <input
+                v-model="form.gaji"
+                type="number"
+                step="0.01"
+                required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Status</label>
               <select
                 v-model="form.status"
                 required
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="aktif">Aktif</option>
+                <option value="non_aktif">Non Aktif</option>
+                <option value="cuti">Cuti</option>
               </select>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Address</label>
+              <textarea
+                v-model="form.alamat"
+                rows="3"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              ></textarea>
             </div>
             <div class="flex justify-end space-x-3">
               <button
@@ -230,6 +314,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import { useEmployeeStore } from '@/stores/employee'
+import DashboardChart from '@/components/DashboardChart.vue'
 
 const store = useEmployeeStore()
 const loading = ref(false)
@@ -242,20 +327,37 @@ const selectedEmployee = ref<any>(null)
 const filters = ref({
   search: '',
   departemen: '',
-  status: ''
+  status: '',
+  jabatan: ''
 })
 
 const form = ref({
+  nip: '',
   nama_lengkap: '',
   email: '',
+  no_telepon: '',
+  jabatan: '',
   departemen: '',
-  status: 'active'
+  tanggal_masuk: '',
+  gaji: '',
+  status: 'aktif' as 'aktif' | 'non_aktif' | 'cuti',
+  alamat: ''
 })
 
 // Computed properties
 const employees = computed(() => store.employees)
 const departments = computed(() => store.departments)
+const jabatanList = computed(() => store.jabatanList)
 const pagination = computed(() => store.pagination)
+
+// Helper function to format date
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
 
 // Methods
 const fetchData = async () => {
@@ -263,6 +365,7 @@ const fetchData = async () => {
   try {
     await store.fetchEmployees(pagination.value.current_page, pagination.value.limit, filters.value)
     await store.fetchDepartments()
+    await store.fetchPositionList()
   } catch (err: any) {
     error.value = err.message
   } finally {
@@ -279,10 +382,16 @@ const changePage = (page: number) => {
 const openCreateModal = () => {
   isEditing.value = false
   form.value = {
+    nip: '',
     nama_lengkap: '',
     email: '',
+    no_telepon: '',
+    jabatan: '',
     departemen: '',
-    status: 'active'
+    tanggal_masuk: '',
+    gaji: '',
+    status: 'aktif',
+    alamat: ''
   }
   showModal.value = true
 }
@@ -297,19 +406,30 @@ const openEditModal = (employee: any) => {
 const closeModal = () => {
   showModal.value = false
   form.value = {
+    nip: '',
     nama_lengkap: '',
     email: '',
+    no_telepon: '',
+    jabatan: '',
     departemen: '',
-    status: 'active'
+    tanggal_masuk: '',
+    gaji: '',
+    status: 'aktif',
+    alamat: ''
   }
 }
 
 const handleSubmit = async () => {
   try {
+    const formData = {
+      ...form.value,
+      gaji: parseFloat(form.value.gaji)
+    }
+    
     if (isEditing.value) {
-      await store.updateEmployee(selectedEmployee.value.id, form.value)
+      await store.updateEmployee(selectedEmployee.value.id, formData)
     } else {
-      await store.createEmployee(form.value)
+      await store.createEmployee(formData)
     }
     closeModal()
     fetchData()
