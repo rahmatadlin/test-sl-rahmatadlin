@@ -42,7 +42,7 @@ class Employee implements JsonSerializable
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
     private float $gaji;
 
-    #[ORM\Column(type: 'string', enumType: 'aktif,non_aktif,cuti')]
+    #[ORM\Column(type: 'string', length: 20)]
     private string $status = 'aktif';
 
     #[ORM\Column(type: 'text', nullable: true)]
