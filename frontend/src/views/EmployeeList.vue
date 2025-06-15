@@ -158,112 +158,114 @@
     </div>
 
     <!-- Create/Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" @click.self="closeModal">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
             {{ isEditing ? 'Edit Employee' : 'Add Employee' }}
           </h3>
           <form @submit.prevent="handleSubmit">
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">NIP</label>
-              <input
-                v-model="form.nip"
-                type="text"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">NIP</label>
+                <input
+                  v-model="form.nip"
+                  type="text"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                <input
+                  v-model="form.nama_lengkap"
+                  type="text"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <input
+                  v-model="form.email"
+                  type="email"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input
+                  v-model="form.no_telepon"
+                  type="tel"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Position</label>
+                <select
+                  v-model="form.jabatan"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option v-for="jabatan in jabatanList" :key="jabatan" :value="jabatan">
+                    {{ jabatan }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Department</label>
+                <select
+                  v-model="form.departemen"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option v-for="dept in departments" :key="dept" :value="dept">
+                    {{ dept }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Join Date</label>
+                <input
+                  v-model="form.tanggal_masuk"
+                  type="date"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Salary</label>
+                <input
+                  v-model="form.gaji"
+                  type="number"
+                  step="0.01"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Status</label>
+                <select
+                  v-model="form.status"
+                  required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="aktif">Aktif</option>
+                  <option value="non_aktif">Non Aktif</option>
+                  <option value="cuti">Cuti</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700">Address</label>
+                <textarea
+                  v-model="form.alamat"
+                  rows="3"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                ></textarea>
+              </div>
             </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Full Name</label>
-              <input
-                v-model="form.nama_lengkap"
-                type="text"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                v-model="form.email"
-                type="email"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Phone Number</label>
-              <input
-                v-model="form.no_telepon"
-                type="tel"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Position</label>
-              <select
-                v-model="form.jabatan"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option v-for="jabatan in jabatanList" :key="jabatan" :value="jabatan">
-                  {{ jabatan }}
-                </option>
-              </select>
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Department</label>
-              <select
-                v-model="form.departemen"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option v-for="dept in departments" :key="dept" :value="dept">
-                  {{ dept }}
-                </option>
-              </select>
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Join Date</label>
-              <input
-                v-model="form.tanggal_masuk"
-                type="date"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Salary</label>
-              <input
-                v-model="form.gaji"
-                type="number"
-                step="0.01"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Status</label>
-              <select
-                v-model="form.status"
-                required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="aktif">Aktif</option>
-                <option value="non_aktif">Non Aktif</option>
-                <option value="cuti">Cuti</option>
-              </select>
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Address</label>
-              <textarea
-                v-model="form.alamat"
-                rows="3"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              ></textarea>
-            </div>
-            <div class="flex justify-end space-x-3">
+            <div class="flex justify-end space-x-3 mt-4">
               <button
                 type="button"
                 @click="closeModal"
@@ -284,7 +286,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" @click.self="closeDeleteModal">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Confirm Delete</h3>
@@ -312,7 +314,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, onUnmounted } from 'vue'
 import { useEmployeeStore } from '@/stores/employee'
 import DashboardChart from '@/components/DashboardChart.vue'
 
@@ -330,6 +332,19 @@ const filters = ref({
   status: '',
   jabatan: ''
 })
+
+// Add debounce timer ref
+const searchTimeout = ref<number | null>(null)
+
+// Add debounced search function
+const debouncedSearch = () => {
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value)
+  }
+  searchTimeout.value = window.setTimeout(() => {
+    store.fetchEmployees(1, pagination.value.limit, filters.value)
+  }, 1000)
+}
 
 const form = ref({
   nip: '',
@@ -459,9 +474,20 @@ const handleDelete = async () => {
 }
 
 // Watch for filter changes
-watch(filters, () => {
-  store.fetchEmployees(1, pagination.value.limit, filters.value)
+watch(filters, (newFilters) => {
+  if (newFilters.search !== undefined) {
+    debouncedSearch()
+  } else {
+    store.fetchEmployees(1, pagination.value.limit, filters.value)
+  }
 }, { deep: true })
+
+// Clean up timeout on component unmount
+onUnmounted(() => {
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value)
+  }
+})
 
 // Lifecycle hooks
 onMounted(() => {

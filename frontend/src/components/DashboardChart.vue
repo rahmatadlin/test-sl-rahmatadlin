@@ -9,65 +9,84 @@ let chart: echarts.ECharts | null = null
 
 const initChart = () => {
   if (chartRef.value) {
+    console.log('Initializing chart with container:', chartRef.value)
     chart = echarts.init(chartRef.value)
+    // Add resize listener
+    window.addEventListener('resize', () => {
+      chart?.resize()
+    })
   }
 }
 
 const updateChart = () => {
-  if (!chart || !store.statistics) return
+  console.log('Updating chart with statistics:', store.statistics)
+  if (!chart) {
+    console.error('Chart instance is null')
+    return
+  }
+  if (!store.statistics) {
+    console.error('Statistics data is null')
+    return
+  }
+  if (!store.statistics.by_department) {
+    console.error('Department data is missing')
+    return
+  }
 
   const option = {
     title: {
-      text: 'Employee Statistics'
+      text: 'Employee Statistics by Department'
     },
     tooltip: {
       trigger: 'axis'
     },
     legend: {
-      data: ['Total Employees', 'Active Employees', 'Inactive Employees', 'On Leave']
+      data: ['Total Employees']
     },
     xAxis: {
       type: 'category',
-      data: store.statistics.departments.map((dept: any) => dept.name)
+      data: store.statistics.by_department.map((dept: any) => dept.departemen)
     },
     yAxis: {
-      type: 'value'
+      type: 'value',
+      min: 0,
+      interval: 1,
+      axisLabel: {
+        formatter: (value: number) => Math.round(value).toString()
+      }
     },
     series: [
       {
         name: 'Total Employees',
         type: 'bar',
-        data: store.statistics.departments.map((dept: any) => dept.total_employees)
-      },
-      {
-        name: 'Active Employees',
-        type: 'bar',
-        data: store.statistics.departments.map((dept: any) => dept.active_employees)
-      },
-      {
-        name: 'Inactive Employees',
-        type: 'bar',
-        data: store.statistics.departments.map((dept: any) => dept.inactive_employees)
-      },
-      {
-        name: 'On Leave',
-        type: 'bar',
-        data: store.statistics.departments.map((dept: any) => dept.on_leave_employees)
+        data: store.statistics.by_department.map((dept: any) => dept.count)
       }
     ]
   }
 
-  chart.setOption(option)
+  try {
+    chart.setOption(option)
+    console.log('Chart updated successfully')
+  } catch (error) {
+    console.error('Error updating chart:', error)
+  }
 }
 
 // Watch for statistics changes
-watch(() => store.statistics, () => {
+watch(() => store.statistics, (newStats) => {
+  console.log('Statistics changed:', newStats)
   updateChart()
 }, { deep: true })
 
 onMounted(async () => {
+  console.log('Component mounted')
   initChart()
-  await store.fetchStatistics()
+  try {
+    await store.fetchStatistics()
+    console.log('Statistics fetched successfully')
+  } catch (error) {
+    console.error('Error fetching statistics:', error)
+  }
 })
 </script>
 

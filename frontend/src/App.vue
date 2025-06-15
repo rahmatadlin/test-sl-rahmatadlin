@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import DashboardChart from './components/DashboardChart.vue'
+import { RouterView } from 'vue-router'
+import Sidebar from './components/Sidebar.vue'
 </script>
 
 <template>
-  <router-view></router-view>
+  <div class="flex min-h-screen">
+    <Sidebar />
+    <main class="flex-1">
+      <RouterView />
+    </main>
+  </div>
 </template>
 
 <style>
