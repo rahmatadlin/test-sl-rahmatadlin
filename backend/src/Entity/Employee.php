@@ -10,7 +10,9 @@ use JsonSerializable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'employees')]
-#[ORM\HasLifecycleCallbacks]
+#[ORM\Index(name: 'idx_nip', columns: ['nip'])]
+#[ORM\Index(name: 'idx_departemen', columns: ['departemen'])]
+#[ORM\Index(name: 'idx_status', columns: ['status'])]
 class Employee implements JsonSerializable
 {
     #[ORM\Id]
@@ -21,13 +23,13 @@ class Employee implements JsonSerializable
     #[ORM\Column(type: 'string', length: 20, unique: true)]
     private string $nip;
 
-    #[ORM\Column(name: 'nama_lengkap', type: 'string', length: 100)]
+    #[ORM\Column(type: 'string', length: 100, name: 'nama_lengkap')]
     private string $namaLengkap;
 
     #[ORM\Column(type: 'string', length: 100, unique: true)]
     private string $email;
 
-    #[ORM\Column(name: 'no_telepon', type: 'string', length: 15, nullable: true)]
+    #[ORM\Column(type: 'string', length: 15, nullable: true, name: 'no_telepon')]
     private ?string $noTelepon = null;
 
     #[ORM\Column(type: 'string', length: 50)]
@@ -36,25 +38,25 @@ class Employee implements JsonSerializable
     #[ORM\Column(type: 'string', length: 50)]
     private string $departemen;
 
-    #[ORM\Column(name: 'tanggal_masuk', type: 'date')]
+    #[ORM\Column(type: 'date', name: 'tanggal_masuk')]
     private DateTime $tanggalMasuk;
 
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
     private float $gaji;
 
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(type: 'string', columnDefinition: "ENUM('aktif', 'non_aktif', 'cuti')", options: ['default' => 'aktif'])]
     private string $status = 'aktif';
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $alamat = null;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    #[ORM\Column(type: 'datetime', name: 'created_at', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private DateTime $createdAt;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime')]
+    #[ORM\Column(type: 'datetime', name: 'updated_at', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private DateTime $updatedAt;
 
-    #[ORM\Column(name: 'deleted_at', type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime', name: 'deleted_at', nullable: true)]
     private ?DateTime $deletedAt = null;
 
     public function __construct()

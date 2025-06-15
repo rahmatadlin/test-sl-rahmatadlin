@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+
+use App\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+
+if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+    echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL;
+}
+
+require __DIR__.'/../vendor/autoload.php';
+
+$kernel = new Kernel($_SERVER['APP_ENV'] ?? 'dev', (bool) ($_SERVER['APP_DEBUG'] ?? true));
+$application = new Application($kernel);
+$application->run();
+
+use Symfony\Component\Console\Application as ConsoleApplication;
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+
+$entityManager = require __DIR__ . '/../config/doctrine.php';
+
+$application = new ConsoleApplication('Doctrine Command Line Interface', '1.0.0');
+$application->addCommands([
+    new \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand(new SingleManagerProvider($entityManager)),
+    new \Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand(new SingleManagerProvider($entityManager)),
+    new \Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand(new SingleManagerProvider($entityManager)),
+]);
+
+$application->run();
+
+return ConsoleRunner::createHelperSet($entityManager); 
